@@ -1,7 +1,8 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { generateAccessToken,generateRefreshToken,setRefreshTokenCookie } from "../services/tokenService.js";
 
+// getAlluser
 export const getUsers = async (req, res) => {
   try {
     const users = await Users.findAll();
@@ -11,17 +12,18 @@ export const getUsers = async (req, res) => {
   }
 };
 
+// register
 export const Register = async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
-
-  if (password !== confirmPassword) {
-    return res.status(400).json({
-      msg: "password not match",
-    });
-  }
-  const salt = await bcrypt.genSalt(); //"Salt" adalah string acak yang akan ditambahkan ke password sebelum dienkripsi
-  const hashPassword = await bcrypt.hash(password, salt); // Password yang telah dienkripsi tidak bisa dikembalikan ke bentuk aslinya, sehingga lebih aman.
   try {
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        msg: "password not match",
+      });
+    }
+    const salt = await bcrypt.genSalt(); //"Salt" adalah string acak yang akan ditambahkan ke password sebelum dienkripsi
+    const hashPassword = await bcrypt.hash(password, salt); // Password yang telah dienkripsi tidak bisa dikembalikan ke bentuk aslinya, sehingga lebih aman.
+
     await Users.create({
       name: name,
       email: email,
@@ -33,53 +35,48 @@ export const Register = async (req, res) => {
   }
 };
 
+// login
 export const Login = async (req, res) => {
-  try {
-    const user = await Users.findAll({
-      where: {
-        email: req.body.email,
-      },
-    });
-    const match = await bcrypt.compare(req.body.password, user[0].password);
-    // console.log('user?', user[0].id);
-    // console.log('match?' , match);
+  const { email, password } = req.body;
 
-    if (!match) {
-      return res.status(400).json({ mesg: "Wrong Password" });
+  try {
+    // Cari pengguna berdasarkan email
+    const user = await Users.findOne({ where: { email } });
+    // console.log(user);
+
+    // Jika user tidak ditemukan
+    if (!user) {
+      return res.status(404).json({ msg: "Email tidak ditemukan" });
     }
-    const userId = user[0].id;
-    const name = user[0].name;
-    const email = user[0].email;
-    const accessToken = jwt.sign(
-      { userId, name, email },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: "20s",
-      }
-    );
-    const refreshToken = jwt.sign(
-      { userId, name, email },
-      process.env.REFRESH_TOKEN_SECRET,
-      {
-        expiresIn: "1d",
-      }
-    );
-    await Users.update(
-      { refresh_token: refreshToken },
-      {
-        where: {
-          id: userId,
-        },
-      }
-    );
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      // secure:true
-    });
+
+    // Bandingkan password yang dimasukkan dengan password yang ada di database
+    const match = await bcrypt.compare(password, user.password);
+
+    // Jika password tidak cocok
+    if (!match) {
+      return res.status(400).json({ msg: "Wrong Password" });
+    }
+
+    // Siapkan data untuk token , access object user from userModel
+    const { id: userId, name, email: userEmail } = user;
+
+    // Generate Access Token
+    const accessToken = generateAccessToken(userId, name, userEmail);
+    // Generate Refresh Token
+    const refreshToken = generateRefreshToken(userId, name, userEmail);
+
+    // Update refresh token di database
+    await Users.update({ refresh_token: refreshToken }, { where: { id: userId } });
+
+    // Set refresh token di cookies
+    setRefreshTokenCookie(res, refreshToken);
+    console.log('Generated refresh token:', refreshToken);
+
+    // Kirimkan Access Token sebagai respons
     res.json({ accessToken });
+
   } catch (error) {
-    console.log(error);
-    return res.status(404).json({ msg: "Email tidak ditemukan" });
+    console.error(error);
+    res.status(500).json({ msg: "Terjadi kesalahan, coba lagi nanti." });
   }
 };
