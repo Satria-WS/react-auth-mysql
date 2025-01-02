@@ -78,7 +78,6 @@ export const Login = async (req, res) => {
       // secure:true
     });
     res.json({ accessToken });
-    await Users.update({refresh_token:refreshToken})
   } catch (error) {
     console.log(error);
     return res.status(404).json({ msg: "Email tidak ditemukan" });
