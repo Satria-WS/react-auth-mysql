@@ -1,11 +1,11 @@
-import { Sequelize } from "sequelize";
-import db from "../config/Database.js";
+import { Sequelize } from 'sequelize';
+import db from '../config/Database.js';
 
 const { DataTypes } = Sequelize;
 
 // schema
 const Users = db.define(
-  "users",
+  'users',
   {
     name: {
       type: DataTypes.STRING,
@@ -22,7 +22,7 @@ const Users = db.define(
   },
   {
     freezeTableName: true,
-  }
+  },
 );
 
 export default Users;

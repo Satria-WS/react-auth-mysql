@@ -1,12 +1,16 @@
-import Users from "../models/UserModel.js";
-import bcrypt from "bcrypt";
-import { generateAccessToken,generateRefreshToken,setRefreshTokenCookie } from "../services/tokenService.js";
+import Users from '../models/UserModel.js';
+import bcrypt from 'bcrypt';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  setRefreshTokenCookie,
+} from '../services/tokenService.js';
 
 // getAlluser
 export const getUsers = async (req, res) => {
   try {
     const users = await Users.findAll({
-       attributes:['id','name','email']
+      attributes: ['id', 'name', 'email'],
     });
     res.json(users);
   } catch (error) {
@@ -20,7 +24,7 @@ export const Register = async (req, res) => {
   try {
     if (password !== confirmPassword) {
       return res.status(400).json({
-        msg: "password not match",
+        msg: 'password not match',
       });
     }
     const salt = await bcrypt.genSalt(); //"Salt" adalah string acak yang akan ditambahkan ke password sebelum dienkripsi
@@ -31,7 +35,7 @@ export const Register = async (req, res) => {
       email: email,
       password: hashPassword,
     });
-    return res.status(201).json({ msg: "Register succesfull" });
+    return res.status(201).json({ msg: 'Register succesfull' });
   } catch (error) {
     console.log(error);
   }
@@ -48,7 +52,7 @@ export const Login = async (req, res) => {
 
     // Jika user tidak ditemukan
     if (!user) {
-      return res.status(404).json({ msg: "Email tidak ditemukan" });
+      return res.status(404).json({ msg: 'Email tidak ditemukan' });
     }
 
     // Bandingkan password yang dimasukkan dengan password yang ada di database
@@ -56,7 +60,7 @@ export const Login = async (req, res) => {
 
     // Jika password tidak cocok
     if (!match) {
-      return res.status(400).json({ msg: "Wrong Password" });
+      return res.status(400).json({ msg: 'Wrong Password' });
     }
 
     // Siapkan data untuk token , access object user from userModel
@@ -68,17 +72,19 @@ export const Login = async (req, res) => {
     const refreshToken = generateRefreshToken(userId, name, userEmail);
 
     // Update refresh token di database
-    await Users.update({ refresh_token: refreshToken }, { where: { id: userId } });
+    await Users.update(
+      { refresh_token: refreshToken },
+      { where: { id: userId } },
+    );
 
     // Set refresh token di cookies
     setRefreshTokenCookie(res, refreshToken);
     console.log('Generated refresh token:', refreshToken);
 
     // Kirimkan Access Token sebagai respons
-    res.json({ accessToken , msg:"token succesfully"});
-
+    res.json({ accessToken, msg: 'token succesfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Terjadi kesalahan, coba lagi nanti." });
+    res.status(500).json({ msg: 'Terjadi kesalahan, coba lagi nanti.' });
   }
 };
