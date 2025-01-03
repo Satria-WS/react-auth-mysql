@@ -8,9 +8,9 @@ export const verifyToken = (req, res, next) => {
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, deocoded) => {
     if (error) {
-      return res.sendStatus(403);
+      return res.sendStatus(403).json({msg:"Harus login terlebih dahulu"});
     }
-    req.email = deocoded.email;
+    // req.email = deocoded.email;
     next();
   });
 };
