@@ -1,16 +1,24 @@
 import jwt from "jsonwebtoken";
 
-export const verifyToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token === null) {
-    return res.sendStatus(401);
-  }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, deocoded) => {
-    if (error) {
-      return res.sendStatus(403).json({msg:"Harus login terlebih dahulu"});
+export const verifyToken = async (req, res, next) => {
+
+    const authHeader = req.headers["authorization"];
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
+       res.sendStatus(401).json({ msg: "Authorization token is missing or wrong" });
     }
-    // req.email = deocoded.email;
-    next();
-  });
+    const token = authHeader.split(" ")[1];
+    try {
+    // Verify token asynchronously
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+      if (error) {
+         res.sendStatus(403).json({ msg: "Forbidden: Invalid or expired token" });
+      }
+
+      // req.email = decoded.email;
+      next(); // Proceed to the next middleware or route handler
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Forbidden: An unexpected error occurred while verifying the token"});
+  }
 };
