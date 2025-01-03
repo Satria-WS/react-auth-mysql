@@ -6,7 +6,7 @@ import { generateAccessToken,generateRefreshToken,setRefreshTokenCookie } from "
 export const getUsers = async (req, res) => {
   try {
     const users = await Users.findAll({
-      attributes:['id','name','email']
+       attributes:['id','name','email']
     });
     res.json(users);
   } catch (error) {
@@ -75,7 +75,7 @@ export const Login = async (req, res) => {
     console.log('Generated refresh token:', refreshToken);
 
     // Kirimkan Access Token sebagai respons
-    res.json({ accessToken });
+    res.json({ accessToken , msg:"token succesfully"});
 
   } catch (error) {
     console.error(error);
