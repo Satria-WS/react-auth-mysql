@@ -5,7 +5,7 @@ export const verifyToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer')) {
       return res
-        .sendStatus(401)
+        .status(401)
         .json({ msg: 'Authorization token is missing or wrong' });
     }
     const token = authHeader.split(' ')[1];
@@ -14,7 +14,7 @@ export const verifyToken = async (req, res, next) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
       if (error) {
         return res
-          .sendStatus(403)
+          .status(403)
           .json({ msg: 'Forbidden: Invalid or expired token' });
       }
 
@@ -23,10 +23,8 @@ export const verifyToken = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({
-        msg: 'Forbidden: An unexpected error occurred while verifying the token',
-      });
+    return res.status(500).json({
+      msg: 'Forbidden: An unexpected error occurred while verifying the token',
+    });
   }
 };
