@@ -22,6 +22,4 @@ app.use(express.json());
 // Mengatur semua rute atau jalan ke berbagai "halaman" server.
 app.use(router);
 
-
-
 app.listen(5000, () => console.log('server running at port 5000'));

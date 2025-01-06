@@ -37,6 +37,7 @@ export const refreshToken = async (req, res) => {
         const { id: userId, name, email } = user;
 
         //jwt.sign , membuat access token baru dan berlaku hanya 15 detik
+        //Kode ini digunakan untuk menghasilkan JSON Web Token (JWT) yang berisi informasi pengguna yang telah diverifikasi (seperti userId, name, dan email).
         const accessToken = jwt.sign(
           { userId, name, email },
           process.env.ACCESS_TOKEN_SECRET,

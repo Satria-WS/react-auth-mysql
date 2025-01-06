@@ -88,3 +88,42 @@ export const Login = async (req, res) => {
     res.status(500).json({ msg: 'Terjadi kesalahan, coba lagi nanti.' });
   }
 };
+
+// logout
+// Setelah logout, refreshToken dihapus baik dari cookie di browser pengguna maupun dari database, memastikan bahwa token yang sudah digunakan tidak bisa digunakan lagi
+export const logout = async (req, res) => {
+  try {
+    // Ambil refreshToken dari cookie
+    const refreshToken = req.cookies.refreshToken;
+
+    // Jika refreshToken tidak ada, respons dengan status 204 (No Content)
+    if (!refreshToken) {
+      return res.status(204).json({ message: 'No refresh token found' });
+    }
+
+    // Cari user berdasarkan refreshToken
+    const user = await Users.findOne({
+      where: { refresh_token: refreshToken },
+    });
+
+    // Jika user tidak ditemukan, respons dengan status 204 (No Content)
+    if (!user) {
+      return res
+        .status(204)
+        .json({ message: 'User not found or invalid refresh token' });
+    }
+
+    // Ambil id pengguna dan update refresh_token menjadi null di database
+    const { id: userId } = user;
+    await Users.update({ refresh_token: null }, { where: { id: userId } });
+
+    // Hapus refresh token di cookie browser
+    res.clearCookie('refreshToken');
+
+    // Kirim respons sukses dengan status 200
+    return res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
