@@ -18,7 +18,7 @@ export const verifyToken = async (req, res, next) => {
           .json({ msg: 'Forbidden: Invalid or expired token' });
       }
 
-      req.email = decoded.email;
+      // req.email = decoded.email;
       next(); // Proceed to the next middleware or route handler
     });
   } catch (error) {
