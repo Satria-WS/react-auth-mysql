@@ -127,3 +127,27 @@ export const Logout = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// delete a user by ID
+export const deleteUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Find user by ID
+    const user = await Users.findOne({ where: { id: userId } });
+
+    // If user not found, respond with status 404 (Not Found)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Delete user from database
+    await Users.destroy({ where: { id: userId } });
+
+    // Respond with success status 200
+    return res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
