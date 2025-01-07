@@ -11,6 +11,7 @@ const Register = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [error, setError] = useState("");
+  const [isSubmit, setSubmit] = useState(false);
   // show password
   const [show, setShow] = useState({
     password: false,
@@ -56,10 +57,12 @@ const Register = () => {
     } else if (!/[0-9]/.test(password)) {
       setPasswordError("Password must contain at least one number");
       valid = false;
-    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      setPasswordError("Password must contain at least one special character");
-      valid = false;
-    } else {
+    }
+    // else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    //   setPasswordError("Password must contain at least one special character");
+    //   valid = false;
+    // }
+    else {
       setPasswordError("");
     }
 
@@ -75,12 +78,14 @@ const Register = () => {
       setConfirmPasswordError("");
     }
 
+
     // passing data
     if (valid) {
       try {
         await registerService(email, password, confirmPassword); // Call API service to login
         navigate("/dashboard"); // Redirect to dashboard if successful
-      } catch {
+      } catch (error) {
+        console.log(error);
         setError("Register failed");
       }
     }
