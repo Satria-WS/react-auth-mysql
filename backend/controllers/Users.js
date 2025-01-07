@@ -10,7 +10,7 @@ import {
 export const getUsers = async (req, res) => {
   try {
     const users = await Users.findAll({
-      attributes: ['id', 'name', 'email'],
+      // attributes: ['id', 'name', 'email', 'refresh_token'],
     });
     res.json(users);
   } catch (error) {
@@ -91,7 +91,7 @@ export const Login = async (req, res) => {
 
 // logout
 // Setelah logout, refreshToken dihapus baik dari cookie di browser pengguna maupun dari database, memastikan bahwa token yang sudah digunakan tidak bisa digunakan lagi
-export const logout = async (req, res) => {
+export const Logout = async (req, res) => {
   try {
     // Ambil refreshToken dari cookie
     const refreshToken = req.cookies.refreshToken;
