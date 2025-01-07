@@ -4,6 +4,7 @@ import Users from './models/UserModel.js'; // Impor model tabel "Users".
 import router from './routes/index.js'; // Impor rute-rute yang kamu buat.
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,8 @@ try {
 } catch (error) {
   console.log(error);
 }
+
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 //app-cooker-parser
 app.use(cookieParser());
 // Menambahkan middleware supaya server bisa menerima dan membaca data dalam format JSON dari permintaan (request) yang dikirim user.
