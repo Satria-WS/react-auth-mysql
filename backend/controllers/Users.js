@@ -12,32 +12,57 @@ export const getUsers = async (req, res) => {
     const users = await Users.findAll({
       // attributes: ['id', 'name', 'email', 'refresh_token'],
     });
-    res.json(users);
+    return res.status(200).json(users);
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ msg: 'Server error' });
   }
 };
 
 // register
+
 export const Register = async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
+
   try {
-    if (password !== confirmPassword) {
+    // Check if all required fields are provided
+    if (!email || !password || !confirmPassword) {
       return res.status(400).json({
-        msg: 'password not match',
+        msg: 'All fields are required',
       });
     }
-    const salt = await bcrypt.genSalt(); //"Salt" adalah string acak yang akan ditambahkan ke password sebelum dienkripsi
-    const hashPassword = await bcrypt.hash(password, salt); // Password yang telah dienkripsi tidak bisa dikembalikan ke bentuk aslinya, sehingga lebih aman.
 
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        msg: 'Passwords do not match',
+      });
+    }
+
+    // Check if email is already in use
+    const existingUser = await Users.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({
+        msg: 'Email is already in use',
+      });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
+
+    // Create a new user
     await Users.create({
       name: name,
       email: email,
       password: hashPassword,
     });
-    return res.status(201).json({ msg: 'Register succesfull' });
+
+    return res.status(201).json({ msg: 'Registration successful' });
   } catch (error) {
     console.log(error);
+    res.status(500).json({
+      msg: 'Server error',
+    });
   }
 };
 
