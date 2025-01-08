@@ -17,7 +17,7 @@ try {
   console.log(error);
 }
 
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' }));
 //app-cooker-parser
 app.use(cookieParser());
 // Menambahkan middleware supaya server bisa menerima dan membaca data dalam format JSON dari permintaan (request) yang dikirim user.
