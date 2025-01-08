@@ -1,66 +1,58 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginService } from '../services/authService'; // Example service
+import { loginService } from "../services/authService"; // Example service
+import axios from "axios";
 
 const Login = () => {
   const navigate = useNavigate();
   // state input
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // state error
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let valid = true;
+   
 
     // validation email
     if (!email) {
-      setEmailError('Email is required');
-      valid = false;
+      setEmailError("Email is required");
+     
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError('Email is invalid');
-      valid = false;
+      setEmailError("Email is invalid");
+ 
     } else {
-      setEmailError('');
+      setEmailError("");
     }
 
     // validation password
     // add validation password with criteria : Length: A strong password should be at least 8 characters long, but 12 or more is better. Character mix: A strong password should contain a mix of uppercase and lowercase letters, numbers, and special characters.
     if (!password) {
-      setPasswordError('Password is required');
-      valid = false;
+      setPasswordError("Password is required");
+    
     } else if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-      valid = false;
+      setPasswordError("Password must be at least 8 characters long");
+  
     } else if (!/[A-Z]/.test(password)) {
-      setPasswordError('Password must contain at least one uppercase letter');
-      valid = false;
+      setPasswordError("Password must contain at least one uppercase letter");
+ 
     } else if (!/[a-z]/.test(password)) {
-      setPasswordError('Password must contain at least one lowercase letter');
-      valid = false;
+      setPasswordError("Password must contain at least one lowercase letter");
+     
     } else if (!/[0-9]/.test(password)) {
-      setPasswordError('Password must contain at least one number');
-      valid = false;
-    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      setPasswordError('Password must contain at least one special character');
-      valid = false;
-    } else {
-      setPasswordError('');
+      setPasswordError("Password must contain at least one number");
+     
+    } 
+    else {
+      setPasswordError("");
     }
 
-    // passing data
-    if (valid) {
-      try {
-        await loginService(email, password); // Call API service to login
-        navigate('/dashboard');  // Redirect to dashboard if successful
-      } catch {
-        setError('Email or password is incorrect.');
-      }
-    }
+    loginService(email, password);
+
   };
   return (
     <>
@@ -91,11 +83,10 @@ const Login = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    
-                    
                   />
-                  {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
-                 
+                  {emailError && (
+                    <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                  )}
                 </div>
 
                 {/* Password Field */}
@@ -110,9 +101,10 @@ const Login = () => {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                   
                   />
-                   {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
+                  {passwordError && (
+                    <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+                  )}
                 </div>
 
                 {/* Submit Button */}
@@ -123,10 +115,16 @@ const Login = () => {
                   Sign in
                 </button>
                 {/* handle error */}
-                {error && <p className="text-white text-center bg-red-500 text-base font-semibold mt-1.5">{error}</p>}
-                
+                {error && (
+                  <p className="text-white text-center bg-red-500 text-base font-semibold mt-1.5">
+                    {error}
+                  </p>
+                )}
+
                 <p className="border p-2 text-center py-3">
-                  <span className="text-[#6C6C6C] font-medium pr-2">New to account?</span>
+                  <span className="text-[#6C6C6C] font-medium pr-2">
+                    New to account?
+                  </span>
                   <span
                     onClick={() => navigate("/register")}
                     className="text-[#FEAF00] cursor-pointer hover:font-semibold active:underline "

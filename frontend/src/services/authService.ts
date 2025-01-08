@@ -18,7 +18,7 @@ export const loginService = async (email: string, password: string) => {
 
   try {
     // Send login request to API
-    const response = await fetch('/api/login', {
+    const response = await fetch('http://localhost:5000/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
       headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ export const loginService = async (email: string, password: string) => {
 
     // Parse the response data and extract token
     const data = await response.json();
-
+    console.log(data);
     // Store the token in localStorage and cookies
     // localStorage.setItem('token', data.token); // Store in localStorage
     document.cookie = `token=${data.token}; path=/;`; // Store in cookies

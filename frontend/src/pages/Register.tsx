@@ -8,11 +8,13 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // error validation field
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  // is registration succes or not
   const [error, setError] = useState("");
-  const [isSubmit, setSubmit] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   // show password
   const [show, setShow] = useState({
     password: false,
@@ -130,13 +132,23 @@ const Register = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log("Registration successful:", data);
-        // You can redirect the user or show a success message
+        setError(data.msg);
+        setIsSuccess(true)
+        console.log("Registration?", data.msg);//registration succesfull
+        setEmail('');
+        setPassword( '');
+        setConfirmPassword( '');
       } else {
-        console.error("Registration failed:", data.msg);
-        console.log("Registration failed:", data.msg);
-
-        // Show error message to the user
+        setError(data.msg);
+        setIsSuccess(false)
+        console.log(data.msg)
+        // console.error("Registration failed:", data.msg);
+        // console.log('Error email:', data.errors.email);//error for email
+        // setEmailError(data.errors.email);
+        // console.log('Password', data.errors.password);//error for password
+        // setPasswordError(data.errors.password);
+        // console.log('Confirm Password', data.errors.confirmPassword);//error for Confirm Password
+        // setConfirmPasswordError(data.errors.confirmPassword);
       }
     } catch (error) {
       console.error("Server error:", error);
@@ -156,6 +168,7 @@ const Register = () => {
   return (
     <>
       <div className="flex justify-center items-center h-screen bg-custom-gradient">
+       
         <div className="container mx-auto ">
           <div className="bg-white rounded-xl shadow-md  max-w-[475px] mx-auto ">
             {/* text */}
@@ -177,15 +190,16 @@ const Register = () => {
                   </label>
                   <input
                     id="email"
-                    // type="email"
+                    type="email"
                     className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    
                   />
-                  {emailError && (
+                  {/* {emailError && (
                     <p className="text-red-500 text-sm">{emailError}</p>
-                  )}
+                  )} */}
                 </div>
 
                 {/* Password Field */}
@@ -201,10 +215,12 @@ const Register = () => {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                     
                     />
-                    {passwordError && (
+                   
+                    {/* {passwordError && (
                       <p className="text-red-500 text-sm">{passwordError}</p>
-                    )}
+                    )} */}
                     {/* icon show */}
                     <button
                       type="button"
@@ -232,12 +248,13 @@ const Register = () => {
                       placeholder="Enter confirm password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                    
                     />
-                    {confirmPasswordError && (
+                    {/* {confirmPasswordError && (
                       <p className="text-red-500 text-sm">
                         {confirmPasswordError}
                       </p>
-                    )}
+                    )} */}
                     {/* icon show */}
                     <button
                       type="button"
@@ -257,10 +274,15 @@ const Register = () => {
                 </button>
                 {/* handle error */}
                 {error && (
-                  <p className="text-white text-center bg-red-500 text-base font-semibold mt-1.5">
+                  <p className={`text-white text-center text-base font-semibold mt-1.5 ${isSuccess ? 'bg-green-500' : 'bg-red-500'}`}>
                     {error}
                   </p>
                 )}
+                {/* {!error && (
+                  <p className="text-white text-center bg-green-500 text-base font-semibold mt-1.5">
+                    {error}
+                  </p>
+                )} */}
                 <p className="border p-2 text-center py-3">
                   <span className="text-[#6C6C6C] font-medium pr-2">
                     Already have an account?

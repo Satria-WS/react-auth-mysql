@@ -22,15 +22,26 @@ export const getUsers = async (req, res) => {
 
 export const Register = async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
-
   try {
+    // Validate required fields
+    // if (!email || !password || !confirmPassword) {
+    //   return res.status(400).json({
+    //     errors: {
+    //       email: !email ? 'Email is required' : null,
+    //       password: !password ? 'Password is required' : null,
+    //       confirmPassword: !confirmPassword
+    //         ? 'Confirm password is required'
+    //         : null,
+    //     },
+    //   });
+    // }
+
     // Check if all required fields are provided
     if (!email || !password || !confirmPassword) {
       return res.status(400).json({
         msg: 'All fields are required',
       });
     }
-
     // Check if passwords match
     if (password !== confirmPassword) {
       return res.status(400).json({
@@ -57,7 +68,7 @@ export const Register = async (req, res) => {
       password: hashPassword,
     });
 
-    return res.status(201).json({ msg: 'Registration successful' });
+    return res.status(201).json({ msg: 'Registration successfulX' });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -85,7 +96,7 @@ export const Login = async (req, res) => {
 
     // Jika password tidak cocok
     if (!match) {
-      return res.status(400).json({ msg: 'Wrong Password' });
+      return res.status(400).json({ msg: 'Email or password is wrong' });
     }
 
     // Siapkan data untuk token , access object user from userModel
@@ -171,6 +182,20 @@ export const deleteUserById = async (req, res) => {
 
     // Respond with success status 200
     return res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// delete all users
+export const deleteAllUsers = async (req, res) => {
+  try {
+    // Delete all users from database
+    await Users.destroy({ where: {}, truncate: true });
+
+    // Respond with success status 200
+    return res.status(200).json({ message: 'All users deleted successfully' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
