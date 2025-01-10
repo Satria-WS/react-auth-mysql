@@ -124,7 +124,7 @@ export const Login = async (req, res) => {
     // Set refresh token di cookies
     setRefreshTokenCookie(res, refreshToken);
     // setRefreshTokenCookiex(res, refreshToken);  // Call the function to set cookie
- 
+
     // console.log('Generated refresh token:', refreshToken);
 
     // Kirimkan Access Token sebagai respons
