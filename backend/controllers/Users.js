@@ -77,6 +77,14 @@ export const Register = async (req, res) => {
   }
 };
 
+const setRefreshTokenCookiex = (res, refreshToken) => {
+  res.cookie('refresh_token', refreshToken, {
+    httpOnly: true, // Ensure the cookie is not accessible via JavaScript
+    // secure: process.env.NODE_ENV === 'production', // Set to true in production (requires HTTPS)
+    maxAge: 30 * 24 * 60 * 60 * 1000, // Set cookie expiration (e.g., 30 days)
+    sameSite: 'Strict', // Prevent CSRF attacks
+  });
+};
 // login
 export const Login = async (req, res) => {
   const { email, password } = req.body;
@@ -115,10 +123,12 @@ export const Login = async (req, res) => {
 
     // Set refresh token di cookies
     setRefreshTokenCookie(res, refreshToken);
-    console.log('Generated refresh token:', refreshToken);
+    // setRefreshTokenCookiex(res, refreshToken);  // Call the function to set cookie
+ 
+    // console.log('Generated refresh token:', refreshToken);
 
     // Kirimkan Access Token sebagai respons
-    res.json({ accessToken, msg: 'token succesfully' });
+    res.json({ accessToken, msg: 'token succesfully', data: user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: 'Terjadi kesalahan, coba lagi nanti.' });
