@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginService } from "../services/authService"; // Example service
 import axios from "axios";
 
+
 const Login = () => {
   const navigate = useNavigate();
   // state input
@@ -16,15 +17,12 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   
 
     // validation email
     if (!email) {
       setEmailError("Email is required");
-     
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       setEmailError("Email is invalid");
- 
     } else {
       setEmailError("");
     }
@@ -33,26 +31,37 @@ const Login = () => {
     // add validation password with criteria : Length: A strong password should be at least 8 characters long, but 12 or more is better. Character mix: A strong password should contain a mix of uppercase and lowercase letters, numbers, and special characters.
     if (!password) {
       setPasswordError("Password is required");
-    
     } else if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters long");
-  
     } else if (!/[A-Z]/.test(password)) {
       setPasswordError("Password must contain at least one uppercase letter");
- 
     } else if (!/[a-z]/.test(password)) {
       setPasswordError("Password must contain at least one lowercase letter");
-     
     } else if (!/[0-9]/.test(password)) {
       setPasswordError("Password must contain at least one number");
-     
-    } 
-    else {
+    } else {
       setPasswordError("");
     }
 
-    loginService(email, password);
+    try {
+      // Send login request to the server
+      const response = await axios.post("http://localhost:5000/login", {
+        email: email,
+        password: password,
+      });
 
+      // If the login is successful, response.data should contain the msg
+      if (response.status === 200) {
+        console.log(response.data.msg); // Log the success message
+        // You can navigate to the dashboard here
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data.msg);
+        setError(error.response.data.msg);
+      }
+    }
   };
   return (
     <>
