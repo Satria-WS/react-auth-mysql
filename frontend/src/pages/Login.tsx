@@ -48,17 +48,19 @@ const Login = () => {
       const response = await axios.post("http://localhost:5000/login", {
         email: email,
         password: password,
-      });
+      }, { withCredentials: true });
 
       // If the login is successful, response.data should contain the msg
       if (response.status === 200) {
         console.log(response.data.msg); // Log the success message
+        console.log(response.data);
         // You can navigate to the dashboard here
         navigate("/dashboard");
       }
     } catch (error) {
       if (error.response) {
         console.log(error.response.data.msg);
+       
         setError(error.response.data.msg);
       }
     }
