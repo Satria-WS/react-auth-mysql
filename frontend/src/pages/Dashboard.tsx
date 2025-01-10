@@ -18,7 +18,11 @@ const Dashboard = () => {
       const decoded = jwtDecode(response.data.accessToken)
       console.log(decoded);
     } catch (error) {
-      console.log(error)
+      if (Response.error) {
+        console.log(error.response.data);
+        console.log(error)
+      }
+     
     }
   }
 
