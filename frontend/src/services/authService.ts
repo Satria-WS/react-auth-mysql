@@ -1,47 +1,62 @@
-
 //login service
 export const loginService = async (email: string, password: string) => {
-  // cari cookie
+  // Function to retrieve cookies by name
   const getCookie = (name: string): string | null => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
     return null;
   };
 
   // Check if the token already exists in cookies
-  const existingToken = getCookie('token');
+  const existingToken = getCookie("token");
   if (existingToken) {
-    console.log('Token already exists in cookies');
+    console.log("Token already exists in cookies");
     return;
   }
 
   try {
     // Send login request to API
-    const response = await fetch('http://localhost:5000/login', {
-      method: 'POST',
+    const response = await fetch("http://localhost:5000/login", {
+      method: "POST",
       body: JSON.stringify({ email, password }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
 
-    // Check if the response is successful
+    // Parse the response data and handle errors
+    const data = await response.json();
+
+    // Check if the response is not successful
     if (!response.ok) {
-      throw new Error('Login failed');
+      console.error("Login failed:", data.msg || "Unknown error");
+      throw new Error(data.msg || "Login failed");
+    } else {
+      console.log("Login successful:", data.msg || "Welcome!");
     }
 
-    // Parse the response data and extract token
-    const data = await response.json();
-    console.log(data);
-    // Store the token in localStorage and cookies
-    // localStorage.setItem('token', data.token); // Store in localStorage
-    document.cookie = `token=${data.token}; path=/;`; // Store in cookies
+    // Set a proper cookie expiration date
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 1); // Token expires in 1 day
+    // Also, ensure the cookie is sent correctly with SameSite=Strict or None if needed
+    document.cookie = `token=${data.token}; path=/; expires=${expires.toUTCString()}; SameSite=Strict; Secure`;
+
+    // Optionally store in localStorage for better accessibility across sessions
+    localStorage.setItem("token", data.token);
+
   } catch (error) {
-    console.error('An error occurred during login:', error);
+    console.error("An error occurred during login:", error);
   }
 };
 
+
+
 //register service
-export const registerService = async (_name: string, email: string, password: string, confirmPassword: string) => {
+export const registerService = async (
+  _name: string,
+  email: string,
+  password: string,
+  confirmPassword: string
+) => {
   try {
     const response = await fetch("http://localhost:5000/users", {
       method: "POST",
@@ -61,11 +76,11 @@ export const registerService = async (_name: string, email: string, password: st
     } else {
       console.error("Registration failed:", data.msg);
       console.log("Registration failed:", data.msg);
-      
+
       // Show error message to the user
     }
   } catch (error) {
     console.error("Server error:", error);
-    console.log(error)
+    console.log(error);
   }
 };
