@@ -76,7 +76,7 @@ export const Register = async (req, res) => {
     });
   }
 };
-
+// add set cookie
 const setRefreshTokenCookiex = (res, refreshToken) => {
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true, // Ensure the cookie is not accessible via JavaScript
